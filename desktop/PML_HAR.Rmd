@@ -1,0 +1,43 @@
+---
+title: "PML_HAR"
+author: "Ricardo Portilla"
+date: "Sunday, April 26, 2015"
+output: html_document
+---
+
+Building a model using a random forest and a subset of variables:
+
+```{r}
+library(caret)
+library(randomForest)
+set.seed(1000)
+setwd("C:/Users/Ricardo/Desktop")
+training<-read.csv("pml-training.csv")
+inTrain<-createDataPartition(training$classe, p=0.8, list=FALSE)
+train<-training[inTrain,]
+cv<-training[-inTrain,]
+train_modRf<-randomForest(classe ~ gyros_belt_x + gyros_belt_y + gyros_belt_z
+                    + accel_belt_x + accel_belt_y + accel_belt_z
+                    + magnet_belt_x + magnet_belt_y + magnet_belt_z
+                    + gyros_arm_x + gyros_arm_y + gyros_arm_z
+                    + accel_arm_x + accel_arm_y + accel_arm_z
+                    + magnet_arm_x + magnet_arm_y + magnet_arm_z
+                    + gyros_dumbbell_x + gyros_dumbbell_y + gyros_dumbbell_z
+                    + accel_dumbbell_x + accel_dumbbell_y + accel_dumbbell_z
+                    + magnet_dumbbell_x + magnet_dumbbell_y + magnet_dumbbell_z
+                    + accel_forearm_x + accel_forearm_y + accel_forearm_z
+                    + magnet_forearm_x + magnet_forearm_y + magnet_forearm_z
+                    + gyros_forearm_x + gyros_forearm_y + gyros_forearm_z,train)
+train_rf_pred<-predict(train_modRf, train)
+train_cmbnd<-cbind(train, train_rf_pred)
+sum(train_cmbnd$classe == train_rf_pred)/length(train_rf_pred)*100
+
+cv_rf_pred<-predict(train_modRf, cv)
+cv_cmbnd<-cbind(cv, cv_rf_pred)
+```
+
+Out of sample error:
+
+```{r, echo=FALSE}
+sum(cv_cmbnd$classe == cv_rf_pred)/length(cv_rf_pred)*100
+```
