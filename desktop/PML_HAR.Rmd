@@ -5,7 +5,19 @@ date: "Sunday, April 26, 2015"
 output: html_document
 ---
 
-Building a model using a random forest and a subset of variables:
+```{r}
+library(ggplot2)
+library(caret)
+setwd("C:/Users/Ricardo/Desktop")
+training<-read.csv("pml-training.csv")
+inTrain<-createDataPartition(training$classe, p=0.8, list=FALSE)
+train<-training[inTrain,]
+qplot(classe, data=train, colour=classe)
+```
+
+We used the ggplot2 library in order to get a visualization of the classes of exercise in the HAR data. It looked evenly distributed and no variables were missing. In order to get a good prediction, we decieded to build a model using a random forest and a subset of variables corresponding to the positions for each exercise for each subject in the data set.
+
+Note that we use the caret library to split the data into a training and test subset so we can compute an out-of-sample error. We use accuracy as our metric for a good prediction. The out-of-sample on the cross validation dataset is computed below.
 
 ```{r}
 library(caret)
@@ -38,6 +50,6 @@ cv_cmbnd<-cbind(cv, cv_rf_pred)
 
 Out of sample error:
 
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 sum(cv_cmbnd$classe == cv_rf_pred)/length(cv_rf_pred)*100
 ```
